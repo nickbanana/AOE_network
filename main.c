@@ -14,8 +14,16 @@ typedef struct activity
     int slack;  //late-early   if slack==0 => critical path
 } ACTIVITY;
 
+typedef struct node
+{
+    int early;
+    int late;
+} NODE;
+
+
 int raw[MAX][MAX];
 ACTIVITY list[MAX];
+NODE node_list[MAX];
 int Node_count;
 int Activity_count;
 
@@ -38,7 +46,7 @@ void reset()
     int i,j;
     Node_count=0;
     Activity_count=0;
-    memset(node,0,sizeof(node));
+
     for(i=0;i<99;i++)
     {
         for(j=0;j<99;j++)
@@ -51,6 +59,8 @@ void reset()
         list[i].late=0;
         list[i].slack=0;
         list[i].value=0;
+        node_list[i].early=0;
+        node_list[i].late=0;
     }
 }
 
@@ -83,5 +93,38 @@ void read()
 
 void calculation()
 {
-    
+    int i,j,current_Act;
+    current_Act=0;
+    //first decide the early time table
+    for(i=0;i<Node_count;i++)
+    {
+        for(j=0;j<Node_count;j++)   //scan through array
+        {
+            if(raw[i][j]!=0)
+            {
+                if(node_list[j].early<node_list[i].early+list[current_Act].value)
+                {
+                    node_list[j].early=node_list[i].early+list[current_Act].value;
+
+                }
+                list[current_Act].early=node_list[i].early;
+                current_Act++;
+            }
+        }
+    }
+
+}
+
+void output()
+{
+    int i,j;
+    for(i=0;i<Node_count;i++)
+    {
+        printf("%d ",node_list[i].early);
+    }
+    printf("\n");
+    for(i=0;i<Activity_count;i++)
+    {
+        printf("%d ",list[i].early);
+    }
 }
